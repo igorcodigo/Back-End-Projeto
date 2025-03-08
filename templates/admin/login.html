@@ -1,0 +1,35 @@
+{% extends "admin/login.html" %}
+
+{% block content %}
+  {{ block.super }}
+  <div style="margin-top: 15px; text-align: center;">
+    <!-- Botão de tutorial -->
+    <a href="https://www.youtube.com/" target="_blank" class="button" style="
+        display: inline-block;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-size: 14px;
+        width: 200px; /* Definir largura fixa */
+        margin: 2px 0;"> <!-- Ajuste do espaçamento entre os botões -->
+      Ver Tutorial
+    </a>
+  </div>
+  <div style="margin-top: 2px; text-align: center;">
+    <!-- Botão para WhatsApp -->
+    <a href="https://wa.me/5521996019608?text=Olá%2C%20vim%20falar%20sobre%20o%20site" target="_blank" class="button" style="
+        display: inline-block;
+        background-color: #25D366;
+        color: white;
+        text-decoration: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-size: 14px;
+        width: 200px; /* Largura fixa igual ao botão do tutorial */
+        margin: 2px 0;"> <!-- Espaçamento igual -->
+      WhatsApp do Desenvolvedor 5521996019608
+    </a>
+  </div>
+{% endblock %}

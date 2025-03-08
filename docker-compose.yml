@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    volumes:
+      - .:/app
+      #Diretorio do banco de dados sqlite
+      - ./db:/app/db
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=True
