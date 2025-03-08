@@ -42,6 +42,7 @@ LOGIN_URL = '/contas/login/'
 # Application definition
 
 INSTALLED_APPS = [
+	'pedidos',
 	'accounts',
 	'rest_framework',
     'django.contrib.admin',
@@ -135,6 +136,7 @@ STATIC_URL = 'static/'
 # Exemplo de trechso relacionados ao STATICFILES_DIRS > 
 # {% load static %} <link rel="stylesheet" href="{% static 'css/basetemplate.css' %}">
 STATICFILES_DIRS = [
+	BASE_DIR / "pedidos" / "static",
     BASE_DIR / "accounts" / "static",
     BASE_DIR / "static"
     # Formato:   BASE_DIR / "nome_do_app" / "static"
