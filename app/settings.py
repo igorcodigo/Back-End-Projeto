@@ -33,8 +33,7 @@ if DEBUG:
         '::1'  # Endereço IPv6 para localhost
     ]
 else:
-    ALLOWED_HOSTS = [
-        '165.232.140.38',  # Adicione outros domínios de produção conforme necessário
+    ALLOWED_HOSTS = ['*'
     ]
 
 LOGIN_URL = '/contas/login/'
