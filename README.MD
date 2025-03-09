@@ -1,4 +1,3 @@
-
 ## Produtos
 
 ### Listar todos os produtos
@@ -287,3 +286,26 @@ Além da API REST, o sistema também oferece um painel administrativo completo a
 - **URL**: `/admin/`
 
 No painel administrativo, os administradores podem gerenciar todos os modelos do sistema (Produtos, Pedidos, Itens de Pedido e Avaliações) através de uma interface gráfica amigável.
+
+## Database Configuration
+
+This project is configured to handle database connections in both Docker and non-Docker environments:
+
+### Docker Environment
+
+When running in Docker:
+- The SQLite database file is stored in the `/app/db/` directory inside the container
+- This directory is mapped to the `./db/` directory in your project root via Docker volumes
+- The `docker-entrypoint.sh` script handles:
+  - Creating the database directory if needed
+  - Copying an existing database to the volume if applicable
+  - Running migrations
+  - Starting the Django server
+
+### Local Environment
+
+When running locally (outside Docker):
+- The SQLite database file is stored in the project root directory (`db.sqlite3`)
+- Standard Django database access is used
+
+The system automatically detects whether it's running in Docker by checking for the `/.dockerenv` file or the `DOCKER_CONTAINER` environment variable.

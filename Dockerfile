@@ -21,8 +21,11 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy project
 COPY . /app/
 
+# Make the entrypoint script executable (for Linux environments)
+RUN chmod +x /app/docker-entrypoint.sh || true
+
 # Expose port 8000
 EXPOSE 8000
 
-# Run the Django development server
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Use the entrypoint script
+ENTRYPOINT ["/app/docker-entrypoint.sh"]

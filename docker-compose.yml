@@ -5,9 +5,15 @@ services:
     build: .
     volumes:
       - .:/app
-      #Diretorio do banco de dados sqlite
-      - ./db:/app/db
+      # Volume persistente para o banco de dados SQLite e referência ao volume nomeado
+      - db_data:/app/db
     ports:
-      - "8000:8000"
+      - "8001:8000"
     environment:
       - DEBUG=True
+
+
+  # Ele garante que os dados do banco de dados sejam mantidos persistentemente
+volumes:
+  # Declaração explícita do volume nomeado
+  db_data:
