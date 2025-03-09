@@ -30,7 +30,8 @@ if DEBUG:
     ALLOWED_HOSTS = [
         'localhost', 
         '127.0.0.1', 
-        '::1'  # Endereço IPv6 para localhost
+        '::1',  # Endereço IPv6 para localhost
+        '165.232.140.38:8001',
     ]
 else:
     ALLOWED_HOSTS = ['*'
