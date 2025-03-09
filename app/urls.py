@@ -21,6 +21,7 @@ from django.shortcuts import redirect
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('contas/', include('accounts.urls')),
+    path('pedidos/', include('pedidos.urls')),
 ]
 
 home_url = '/admin'
