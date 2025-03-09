@@ -11,6 +11,7 @@ if [ -f /app/db.sqlite3 ] && [ ! -f /app/db/db.sqlite3 ]; then
 fi
 
 # Run migrations
+python manage.py makemigrations
 python manage.py migrate
 
 # Start the Django development server
