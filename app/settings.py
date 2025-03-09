@@ -34,7 +34,7 @@ if DEBUG:
     ]
 else:
     ALLOWED_HOSTS = [
-        'www.seudominio.com',  # Adicione outros domínios de produção conforme necessário
+        '165.232.140.38',  # Adicione outros domínios de produção conforme necessário
     ]
 
 LOGIN_URL = '/contas/login/'
