@@ -20,7 +20,7 @@ class Order(models.Model):
         ('Cancelado', 'Cancelado'),
     ]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pendente')
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # Total do pedido
     created_at = models.DateField(auto_now_add=True)  # Data do pedido
@@ -31,7 +31,8 @@ class Order(models.Model):
         self.save()
 
     def __str__(self):
-        return f"Pedido {self.id} - {self.user.username}"
+        username = self.user.username if self.user else "Usuário Anônimo"
+        return f"Pedido {self.id} - {username}"
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name="items", on_delete=models.CASCADE)
@@ -53,11 +54,12 @@ class OrderItem(models.Model):
         unique_together = ('order', 'product')  # Evita duplicação do mesmo produto no pedido
 
 class Review(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     rating = models.PositiveIntegerField()  # Nota (1 a 5)
     comment = models.TextField(blank=True, null=True)
     created_at = models.DateField(auto_now_add=True)  # Data da avaliação
 
     def __str__(self):
-        return f"Avaliação {self.rating} - {self.product.name} ({self.user.username})"
+        username = self.user.username if self.user else "Usuário Anônimo"
+        return f"Avaliação {self.rating} - {self.product.name} ({username})"

@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from .models import Product, Order, OrderItem, Review
 from .serializers import ProductSerializer, OrderSerializer, OrderItemSerializer, ReviewSerializer
+from django.contrib.auth import get_user_model
 
 # Create your views here.
 
@@ -11,7 +12,6 @@ class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     #permission_classes = [permissions.IsAuthenticated]
-    permission_classes = [permissions.AllowAny]
     
     @action(detail=True, methods=['get'])
     def reviews(self, request, pk=None):
@@ -23,19 +23,20 @@ class ProductViewSet(viewsets.ModelViewSet):
 
 class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
-    #permission_classes = [permissions.IsAuthenticated]
-    permission_classes = [permissions.AllowAny]
-    
-    def get_queryset(self):
-        """Filtra pedidos pelo usuário logado, a menos que seja staff"""
-        user = self.request.user
-        if user.is_staff:
-            return Order.objects.all()
-        return Order.objects.filter(user=user)
+    queryset = Order.objects.all()  # Retorna todos os pedidos sem filtro
     
     def perform_create(self, serializer):
-        """Associa o usuário logado ao pedido"""
-        serializer.save(user=self.request.user)
+        """Cria um pedido, usando o usuário atual se autenticado, ou o primeiro usuário do sistema"""
+        User = get_user_model()
+        if self.request.user.is_authenticated:
+            serializer.save(user=self.request.user)
+        else:
+            # Assume o primeiro usuário do sistema para pedidos não autenticados
+            default_user = User.objects.first()
+            if default_user:
+                serializer.save(user=default_user)
+            else:
+                serializer.save() 
     
     @action(detail=True, methods=['post'])
     def calculate_total(self, request, pk=None):
@@ -47,15 +48,7 @@ class OrderViewSet(viewsets.ModelViewSet):
 
 class OrderItemViewSet(viewsets.ModelViewSet):
     serializer_class = OrderItemSerializer
-    #permission_classes = [permissions.IsAuthenticated]
-    permission_classes = [permissions.AllowAny]
-    
-    def get_queryset(self):
-        """Filtra itens de pedido pelo usuário logado, a menos que seja staff"""
-        user = self.request.user
-        if user.is_staff:
-            return OrderItem.objects.all()
-        return OrderItem.objects.filter(order__user=user)
+    queryset = OrderItem.objects.all()  # Retorna todos os itens sem filtro
     
     def perform_create(self, serializer):
         """Salva o item e recalcula o total do pedido"""
@@ -75,20 +68,11 @@ class OrderItemViewSet(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    #permission_classes = [permissions.IsAuthenticated]
-    permission_classes = [permissions.AllowAny]
-    queryset = Review.objects.all()
-    
-    def get_queryset(self):
-        """Filtra avaliações pelo usuário logado, a menos que seja staff"""
-        # user = self.request.user
-        # if user.is_staff:
-        #     return Review.objects.all()
-        # return Review.objects.filter(user=user)
-        return Review.objects.all()
-    
-
+    queryset = Review.objects.all()  # Retorna todas as avaliações sem filtro
     
     def perform_create(self, serializer):
-        """Associa o usuário logado à avaliação"""
-        serializer.save(user=self.request.user)
+        """Cria uma avaliação, associando ao usuário autenticado se disponível"""
+        if self.request.user.is_authenticated:
+            serializer.save(user=self.request.user)
+        else:
+            serializer.save()  # Permite criar sem usuário (será null)
