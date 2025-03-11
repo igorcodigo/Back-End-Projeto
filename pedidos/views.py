@@ -77,6 +77,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     #permission_classes = [permissions.IsAuthenticated]
     permission_classes = [permissions.AllowAny]
+    queryset = Review.objects.all()
     
     def get_queryset(self):
         """Filtra avaliações pelo usuário logado, a menos que seja staff"""
@@ -85,6 +86,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
         #     return Review.objects.all()
         # return Review.objects.filter(user=user)
         return Review.objects.all()
+    
+
     
     def perform_create(self, serializer):
         """Associa o usuário logado à avaliação"""
