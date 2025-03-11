@@ -10,7 +10,7 @@ from .serializers import ProductSerializer, OrderSerializer, OrderItemSerializer
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    #permission_classes = [permissions.IsAuthenticated]
     
     @action(detail=True, methods=['get'])
     def reviews(self, request, pk=None):
@@ -22,7 +22,7 @@ class ProductViewSet(viewsets.ModelViewSet):
 
 class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    #permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
         """Filtra pedidos pelo usuário logado, a menos que seja staff"""
@@ -45,7 +45,7 @@ class OrderViewSet(viewsets.ModelViewSet):
 
 class OrderItemViewSet(viewsets.ModelViewSet):
     serializer_class = OrderItemSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    #permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
         """Filtra itens de pedido pelo usuário logado, a menos que seja staff"""
@@ -72,7 +72,7 @@ class OrderItemViewSet(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    #permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
         """Filtra avaliações pelo usuário logado, a menos que seja staff"""
