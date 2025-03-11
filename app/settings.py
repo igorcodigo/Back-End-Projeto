@@ -45,6 +45,7 @@ INSTALLED_APPS = [
 	'pedidos',
 	'accounts',
 	'rest_framework',
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -54,6 +55,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -190,3 +192,28 @@ REST_FRAMEWORK = {
 #     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
 #     'TOKEN_TYPE_CLAIM': 'token_type',
 # }
+# Permite qualquer origem
+CORS_ALLOW_ALL_ORIGINS = True
+
+# OU você pode especificar origens específicas:
+# CORS_ALLOWED_ORIGINS = [
+#     "https://example.com",
+#     "https://sub.example.com",
+#     "http://localhost:8080",
+# ]
+
+# Permitir cookies em solicitações cross-origin
+CORS_ALLOW_CREDENTIALS = True
+
+# Permitir todos os headers nas requisições
+# CORS_ALLOW_HEADERS = [
+#     'accept',
+#     'accept-encoding',
+#     'authorization',
+#     'content-type',
+#     'dnt',
+#     'origin',
+#     'user-agent',
+#     'x-csrftoken',
+#     'x-requested-with',
+# ]
