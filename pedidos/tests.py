@@ -161,7 +161,8 @@ class APITests(APITestCase):
     def test_product_list_unauthenticated(self):
         """Testa listagem de produtos sem autenticação"""
         response = self.client.get('/pedidos/api/products/')
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)  # Produtos são públicos
+        self.assertTrue(len(response.data) > 0)  # Deve retornar produtos
     
     def test_product_detail(self):
         """Testa detalhes de um produto"""
@@ -181,6 +182,37 @@ class APITests(APITestCase):
         response = self.client.post('/pedidos/api/products/', data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Product.objects.count(), 3)
+    
+    def test_product_update(self):
+        """Testa atualização de um produto"""
+        self.client.force_authenticate(user=self.user)
+        data = {
+            'name': 'Produto 1 Atualizado',
+            'description': 'Descrição atualizada',
+            'price': '12.99'
+        }
+        response = self.client.put(f'/pedidos/api/products/{self.product1.id}/', data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['name'], 'Produto 1 Atualizado')
+        self.assertEqual(response.data['price'], '12.99')
+    
+    def test_product_partial_update(self):
+        """Testa atualização parcial de um produto"""
+        self.client.force_authenticate(user=self.user)
+        data = {
+            'price': '13.99'
+        }
+        response = self.client.patch(f'/pedidos/api/products/{self.product1.id}/', data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['price'], '13.99')
+        self.assertEqual(response.data['name'], 'Produto 1')  # Nome não deve mudar
+    
+    def test_product_delete(self):
+        """Testa exclusão de um produto"""
+        self.client.force_authenticate(user=self.user)
+        response = self.client.delete(f'/pedidos/api/products/{self.product1.id}/')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Product.objects.count(), 1)
     
     def test_order_list_user(self):
         """Testa listagem de pedidos para usuário normal"""
@@ -220,6 +252,24 @@ class APITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Order.objects.count(), 2)
     
+    def test_order_update(self):
+        """Testa atualização de um pedido"""
+        self.client.force_authenticate(user=self.user)
+        data = {
+            'status': 'Preparando',  # Usando um status válido do STATUS_CHOICES
+            'user': self.user.id
+        }
+        response = self.client.put(f'/pedidos/api/orders/{self.order.id}/', data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['status'], 'Preparando')
+    
+    def test_order_delete(self):
+        """Testa exclusão de um pedido"""
+        self.client.force_authenticate(user=self.user)
+        response = self.client.delete(f'/pedidos/api/orders/{self.order.id}/')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Order.objects.count(), 0)
+    
     def test_order_item_create(self):
         """Testa criação de um item de pedido"""
         self.client.force_authenticate(user=self.user)
@@ -236,6 +286,33 @@ class APITests(APITestCase):
         # Total deve ser: (2 * 10.50) + (3 * 15.75) = 21.00 + 47.25 = 68.25
         self.assertEqual(self.order.total, Decimal('68.25'))
     
+    def test_order_item_update(self):
+        """Testa atualização de um item de pedido"""
+        self.client.force_authenticate(user=self.user)
+        data = {
+            'order': self.order.id,
+            'product': self.product1.id,
+            'quantity': 5
+        }
+        response = self.client.put(f'/pedidos/api/order-items/{self.order_item.id}/', data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['quantity'], 5)
+        
+        # Verificar se o total do pedido foi atualizado
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.total, Decimal('52.50'))  # 5 * 10.50
+    
+    def test_order_item_delete(self):
+        """Testa exclusão de um item de pedido"""
+        self.client.force_authenticate(user=self.user)
+        response = self.client.delete(f'/pedidos/api/order-items/{self.order_item.id}/')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(OrderItem.objects.count(), 0)
+        
+        # Verificar se o total do pedido foi atualizado para zero
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.total, Decimal('0'))
+    
     def test_review_create(self):
         """Testa criação de uma avaliação"""
         self.client.force_authenticate(user=self.user)
@@ -248,6 +325,51 @@ class APITests(APITestCase):
         response = self.client.post('/pedidos/api/reviews/', data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Review.objects.count(), 2)
+    
+    def test_review_update(self):
+        """Testa atualização de uma avaliação"""
+        self.client.force_authenticate(user=self.user)
+        data = {
+            'product': self.product1.id,
+            'rating': 3,
+            'comment': 'Atualizando minha avaliação'
+        }
+        response = self.client.put(f'/pedidos/api/reviews/{self.review.id}/', data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['rating'], 3)
+        self.assertEqual(response.data['comment'], 'Atualizando minha avaliação')
+    
+    def test_review_delete(self):
+        """Testa exclusão de uma avaliação"""
+        self.client.force_authenticate(user=self.user)
+        response = self.client.delete(f'/pedidos/api/reviews/{self.review.id}/')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Review.objects.count(), 0)
+    
+    def test_reviews_ordering(self):
+        """Testa se as avaliações estão sendo retornadas em ordem decrescente de data"""
+        # Criar mais algumas avaliações
+        Review.objects.create(
+            user=self.user,
+            product=self.product1,
+            rating=5,
+            comment='Avaliação mais recente'
+        )
+        Review.objects.create(
+            user=self.user,
+            product=self.product1,
+            rating=3,
+            comment='Avaliação intermediária'
+        )
+        
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get('/pedidos/api/reviews/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 3)
+        
+        # Verificar se as datas estão em ordem decrescente
+        dates = [review['created_at'] for review in response.data]
+        self.assertEqual(dates, sorted(dates, reverse=True))
     
     def test_product_reviews(self):
         """Testa endpoint para listar avaliações de um produto"""

@@ -68,7 +68,7 @@ class OrderItemViewSet(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    queryset = Review.objects.all()  # Retorna todas as avaliações sem filtro
+    queryset = Review.objects.all().order_by('-created_at')  # Ordenar por data de criação decrescente
     
     def perform_create(self, serializer):
         """Cria uma avaliação, associando ao usuário autenticado se disponível"""
