@@ -76,3 +76,10 @@ class ReviewViewSet(viewsets.ModelViewSet):
             serializer.save(user=self.request.user)
         else:
             serializer.save()  # Permite criar sem usuário (será null)
+    
+    def perform_update(self, serializer):
+        """Atualiza uma avaliação, mantendo o usuário original se existir"""
+        if self.request.user.is_authenticated:
+            serializer.save(user=self.request.user)
+        else:
+            serializer.save()

@@ -38,10 +38,17 @@ class OrderSerializer(serializers.ModelSerializer):
         return instance
 
 class ReviewSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source='user.username', read_only=True)
+    username = serializers.SerializerMethodField()
     product_name = serializers.CharField(source='product.name', read_only=True)
     
     class Meta:
         model = Review
-        fields = ['id', 'user', 'username', 'product', 'product_name', 'rating', 'comment', 'created_at']
+        fields = ['id', 'user', 'name', 'username', 'product', 'product_name', 'rating', 'comment', 'created_at']
         read_only_fields = ['created_at']
+    
+    def get_username(self, obj):
+        if obj.user:
+            return obj.user.username
+        elif obj.name:
+            return obj.name
+        return "Usuário Anônimo"

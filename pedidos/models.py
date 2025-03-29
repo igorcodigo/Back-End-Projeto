@@ -55,11 +55,17 @@ class OrderItem(models.Model):
 
 class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    name = models.CharField(max_length=100, blank=True, null=True)  # Nome opcional para anônimo ou pseudônimo
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     rating = models.PositiveIntegerField()  # Nota (1 a 5)
     comment = models.TextField(blank=True, null=True)
     created_at = models.DateField(auto_now_add=True)  # Data da avaliação
 
     def __str__(self):
-        username = self.user.username if self.user else "Usuário Anônimo"
+        if self.user:
+            username = self.user.username
+        elif self.name:
+            username = self.name
+        else:
+            username = "Usuário Anônimo"
         return f"Avaliação {self.rating} - {self.product.name} ({username})"
